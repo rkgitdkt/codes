@@ -1,7 +1,25 @@
-#hide elements on inspect
-$(document).keydown(function(event){
-  if(event.keyCode==123)
-    return false;//Prevent from F12
-  else if(event.ctrlKey && event.shiftKey && event.keyCode==73)
-    return false; //Prevent from ctrl+shift+i
-});
+#disable inspect element
+document.onkeydown = function (e) 
+{
+    let disable = false;
+    if (event.keyCode == 123) 
+        disable = true;
+    
+    if (e.ctrlKey && e.shiftKey && (e.keyCode == 'I'.charCodeAt(0) || e.keyCode == 'i'.charCodeAt(0))) {
+        disable = true;
+    
+    if (e.ctrlKey && e.shiftKey && (e.keyCode == 'C'.charCodeAt(0) || e.keyCode == 'c'.charCodeAt(0))) {
+        disable = true;
+    
+    if (e.ctrlKey && e.shiftKey && (e.keyCode == 'J'.charCodeAt(0) || e.keyCode == 'j'.charCodeAt(0))) {
+        disable = true;
+    
+    if (e.ctrlKey && (e.keyCode == 'U'.charCodeAt(0) || e.keyCode == 'u'.charCodeAt(0))) {
+        disable = true;
+    
+    if (e.ctrlKey && (e.keyCode == 'S'.charCodeAt(0) || e.keyCode == 's'.charCodeAt(0))) 
+        disable = true;
+    
+    if(disable)
+      e.preventDevault();
+}
