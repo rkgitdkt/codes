@@ -23,3 +23,6 @@ document.onkeydown = function (e)
     if(disable)
       e.preventDevault();
 }
+
+#we can also do it
+<body oncontextmenu="return false" onkeydown="return false;" onmousedown="return false;">
