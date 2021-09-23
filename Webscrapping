@@ -1,0 +1,57 @@
+from bs4 import BeautifulSoup
+import requests
+import pandas as pd
+
+products = [] #List to store name of the product
+prices = [] #List to store price of the product
+ratings = [] #List to store rating of the product
+
+page_url = "https://www.flipkart.com/mobiles/pr?sid=tyy%2C4io&p%5B%5D=facets.brand%255B%255D%3Drealme&p%5B%5D=facets.availability%255B%255D%3DExclude%2BOut%2Bof%2BStock&param=7564&otracker=clp_metro_expandable_1_3.metroExpandable.METRO_EXPANDABLE_Shop%2BNow_mobile-phones-store_Q1PDG4YW86MF_wp3&fm=neo%2Fmerchandising&iid=M_7ccd57ac-fcd0-4d75-a4bf-571c054156d7_3.Q1PDG4YW86MF&ppt=hp&ppn=homepage&ssid=x1g3z5j35sidwpvk1632377482404"
+# To configure webdriver to use Chrome browser, we have to set the path to chromedriver
+request = requests.get(page_url);
+
+# now use soup to extract info
+soup = BeautifulSoup(request.text, 'html.parser')
+
+""" we are intereseted to extract about realme models , price & rating .
+ so we knew every item contained by ._2kHMtA class
+ brand name has ._4rR01T class
+ rating has . _3LWZlK class 
+ & price has ._30jeq3 _1_WHN1 class
+ """
+
+for item_div in soup.find_all('div',  attrs={'class' : '_2kHMtA'}) : 
+    # append product name
+    p_name = item_div.find('div', attrs = {'class' : '_4rR01T'})
+    products.append(p_name.text)
+
+    # append price
+    price = item_div.find('div', attrs = {'class' : '_30jeq3'})
+    prices.append(price.text)
+    # prices.append( .text() )
+
+    # append rating
+    rating = item_div.find('div', attrs = {'class' : '_3LWZlK'})
+    if(rating is not None) :
+        ratings.append(rating.text)
+    else : 
+        ratings.append('-N/A-')
+
+
+# now we have all data in the list , sabe this data in csv file
+csv = pd.DataFrame({
+    'Product Name' : products,
+    'Price' : prices,
+    'User Rating' : ratings,
+})
+
+csv.to_csv('realme_mobiles.csv', index = False, encoding = False)
+
+
+
+
+
+
+
+
+
