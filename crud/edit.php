@@ -17,7 +17,7 @@ if(isset($_GET['id']))
       <h1>CRUD</h1>
     </div>
     <div id="nav">
-      <a href="index.php">Home</a> | <a href="register.php">Register</a>
+      <a href="index.php">Home</a> | <a href="register.html">Register</a>
     </div>
     <h3>Update user</h3>
     <div id="data">
