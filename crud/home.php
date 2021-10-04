@@ -7,7 +7,7 @@
       <h1>CRUD</h1>
     </div>
     <div id="nav">
-      <a href="crud.php">Home</a> | <a href="register.php">Register</a>
+      <a href="crud.php">Home</a> | <a href="register.html">Register</a>
     </div>
     <h3>User details</h3>
     
