@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>MongoDB Query</title>
+	</head>
+	<body>
+		<h1>Lookup & Select fields</h1>
+		<pre>
+			$pipeline = [
+				// no join test series 
+				[
+					'$lookup' => [
+						'localField' => 'current_field ',
+						'from' => 'test_series',
+						'foreignField' => '_id',
+						'as' => 'test_series'
+					]
+				],
+
+				[
+					'$unwind' => [
+						'path' => '$test_series',
+						'preserveNullAndEmptyArrays' => false
+					]
+				],
+
+				// select field name
+				[
+					'$project'=>[
+						'_id'=> 1,
+						'question_title'=> 1,
+						'level'=> 1,
+						'no_of_option'=>1,
+						'test_series.name' => 1,
+						'created_at'=>1,
+						'answer_status'=>1
+					]
+				],
+
+				['$match' => ['deleted_at' => null]],
+
+				<!-- multiple match -->
+				[
+					'$match'=>[
+						'$and'=>[
+							[
+							  "role.name" => "User"
+							  "expire_date" => [
+							    "$gte" => "2021-08-20"
+							    "$lte" => "2021-08-31"
+							  ]
+							]
+						]
+					]
+				],
+				// sort
+				['$sort' =>['created_at' => -1]],
+			];
+
+
+
+			<!-- we can also use like this -->
+			/*now collect all matches that will match together*/
+	    	$and_match['role.name'] = $type;
+
+	    	if($request->has('user_id') && !empty($request->user_id))
+	    		$and_match['_id'] = (int)trim($request->user_id);
+
+
+	    	/*filter dates*/
+	    	if($request->has('expire_date_from') && !empty($request->expire_date_from))
+		    		$and_match['expire_date']['$gte'] = date('Y-m-d', strtotime($request->expire_date_from));
+
+	    	if($request->has('expire_date_to') && !empty($request->expire_date_to))
+	    		$and_match['expire_date']['$lte'] = date('Y-m-d', strtotime($request->expire_date_to));
+
+			$data = User::where('deleted_at', NUll)->raw(function($collection)use ($type, $and_match)
+			{
+				return $collection->aggregate([
+					// Join with user_role table
+					[
+						'$lookup'=>[
+							'from' => 'role_users',  //collection name of which you want to join
+							'localField' => '_id',   //localfidl name
+							'foreignField' => 'user_id', // foreign field
+							'as' => 'user_role'
+						]
+					],
+
+					['$unwind' => '$user_role'], // $unwind used for getting data in object or for one record only
+
+
+
+					[
+						'$lookup'=>[
+							'from' => 'roles',
+							'localField' => 'user_role.role_id',
+							'foreignField' => '_id',
+							'as' => 'role'
+						]
+					],
+
+					['$unwind' => '$role'],
+
+					[
+						'$lookup'=>[
+							'from' => 'plans',  //collection name of which you want to join
+							'localField' => 'plan',   //localfidl name
+							'foreignField' => '_id', // foreign field
+							'as' => 'plans'
+						]
+					],
+					[
+						'$unwind' => [
+							'path' => '$plans',
+							'preserveNullAndEmptyArrays' => true
+						]
+					],
+
+					[
+						'$match'=>[
+							'$and'=>[
+								$and_match
+							]
+						]
+					],
+					['$project' => [
+						  '_id' => 1,
+						  'first_name' => 1,
+						  'company_name'=>1,
+						  'email' => 1,
+						  'mobileno' => 1,
+						  'plan'=>1,
+						  'expire_date'=>1,
+						  'plans'=>['name'=>1],
+
+						]
+					  ],
+				]);
+			});
+		</pre><br>
+
+		<!-- for date -->
+		$detail->created_at->toDateTime()->format('d M Y h:i:s a');
+
+
+		<pre>
+			Group BY :
+
+			$data = UserFlowAnswer::raw(function($collection) use($userid){
+				return $collection->aggregate([
+					// match where
+					[
+						'$match'=>['user_id'=>$userid]
+					],
+
+					[
+						'$group'=> [
+							'_id'=>'$contact_id',
+							'created_at' => ['$last'=>'$created_at'],  //select column according to order
+							'contact_id' => ['$last' => '$contact_id']
+						],
+
+					]
+
+				]);
+			});
+		</pre>
+
+
+		<h3>Join & Group</h3>
+		<pre>
+			$data = UserFlowAnswer::raw(function($collection) use($userid){
+				return $collection->aggregate([
+					// match where
+					[
+						'$lookup' => [
+							'localField' => 'contact_id',
+							'from' => 'addressbook',
+							'foreignField' => '_id',
+							'as' => 'addressbook'
+						]
+					],
+
+					[
+						'$unwind' => [
+							'path' => '$addressbook',
+							'preserveNullAndEmptyArrays' => false
+						]
+					],
+
+					[
+						'$match'=>['user_id'=>$userid]
+					],
+
+					[
+						'$group'=> [
+							'_id'=>'$addressbook.p_contact_no',
+							'created_at' => ['$last'=>'$created_at'],
+							'contact_id' => ['$last' => '$contact_id']
+						],
+
+					],
+
+					[
+						'$sort' => ['created_at'=>-1]
+					]
+
+				]);
+			});
+		</pre>
+
+		<h4>Compare date</h4>
+		<pre>Go Here :https://stackoverflow.com/questions/36497085/how-can-i-query-a-specific-date-in-mongodb-laravel-i-need-all-data-of-that-date
+
+			Step 1. In Model add this line : 
+    			protected $dates = array('created_at');
+
+    		Step 2. Use this classes to convert normal date in to mongo date
+	    		use MongoDB\BSON\UTCDateTime;
+				use DateTime;
+
+			Step 3. now extrat current date and one day next date & convert it in mongodate
+				$start = date('Y-m-d', strtotime($data_row->created_at->toDateTime()->format('Y-m-d')));
+				$end = date('Y-m-d', strtotime($data_row->created_at->toDateTime()->format('Y-m-d'). '+1days'));
+
+				$start = new UTCDateTime(new DateTime($start." 00:00:00"));
+				$end = new UTCDateTime(new DateTime($end." 00:00:00"));
+
+			Step 4. No use like this for a single date.
+				$user_flow = UserFlowAnswer::where('contact_id', $data_row->contact_id)
+					->where('created_at', '>=', $start)
+					->where('created_at', '<', $end)
+					->orderby('_id','DESC')
+					->get();
+
+
+		</pre>
+		
+	</body>
+</html>
+
