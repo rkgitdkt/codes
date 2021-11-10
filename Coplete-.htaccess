@@ -6,14 +6,15 @@
     RewriteEngine On
     RewriteCond %{SERVER_PORT} 80
     
-    #add https
+    #if http is off
     RewriteCond %{HTTPS} off
     RewriteCond %{HTTP:X-Forwarded-Proto} !https
     RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-    #add www before domain
+    #now set www in domain , it would work only for domain
     RewriteCond %{HTTP_HOST} !^www.padhaikaro.com$ [NC]
-    RewriteRule ^(.*)$ http://www.padhaikaro.com/$1 [L,R=301]
+    RewriteCond %{HTTP_HOST} !^integrity.padhaikaro.com$ [NC]
+    RewriteRule ^(.*)$ https://www.padhaikaro.com/$1 [L,R=301]
 
     #RewriteRule ^(.*)$ https://www.integrity.padhaikaro.com/$1 [R,L]
 
@@ -167,3 +168,5 @@
         RewriteRule .* "/assets/w3tc/pgcache/%{REQUEST_URI}/_index%{ENV:W3TC_UA}%{ENV:W3TC_REF}%{ENV:W3TC_SSL}.xml%{ENV:W3TC_ENC}" [L]
     </IfModule>
     # END W3TC Page Cache core
+
+
