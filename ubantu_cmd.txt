@@ -1,0 +1,68 @@
+
+Permission Issue :
+========================= 
+working as a super user run : sudo -s
+now you are working a super user.
+
+sudo chmod -R 777 folder/file
+or
+chmod -R 777 folder / file.
+===========================================
+
+password used by : mysql_native_password
+
+mysql root login - mysql -u root -p
+then enter password -  Pass123word@
+--------------------------------------
+user / password : root/Pass123word@
+Another super user - CREATE USER 'rahulk'@'localhost' IDENTIFIED WITH caching_sha2_password BY 'Rahulk@unv7';
+Give All permisson - GRANT ALL PRIVILEGES ON *.* TO 'rahulk'@'localhost' WITH GRANT OPTION;
+
+
+
+
+Install laravel -project - 
+/*
+* composer create-project --prefer-dist laravel/laravel test-laravel "5.8.*"
+*/
+
+=============================================
+give permisson to all file and durectory - 
+/* 
+* 1. sudo chmod -R 777 test-laravel
+* 2. then run - sudo chgrp -R www-data test-laravel
+*/
+
+
+//install lamp
+https://www.digitalocean.com/community/tutorials/how-to-install-linux-apache-mysql-php-lamp-stack-ubuntu-18-04
+
+
+Install PHP My ADMIN
+======================
+https://www.digitalocean.com/community/tutorials/how-to-install-and-secure-phpmyadmin-on-ubuntu-20-04
+
+
+=====================================================
+Lportal2 - Installing flysystem 
+=============== 
+1. composer update --no-plugins
+2. composer require league/flysystem-sftp:^1.0
+=====================================================
+
+
+To restart Apache and MySQL services, type:
+============================================
+sudo systemctl restart apache2 
+sudo systemctl restart mysql 
+
+To start Apache and MySQL services, type:
+===========================================
+sudo systemctl start apache2 
+sudo systemctl start mysql 
+
+To stop Apache and MySQL services, type:
+============================================
+sudo systemctl stop apache2 
+sudo systemctl stop mysql 
+
