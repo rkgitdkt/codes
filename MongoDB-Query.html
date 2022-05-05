@@ -241,7 +241,12 @@
 
 
 		</pre>
-		
+						
+						<h3>Find only matching object inside array</h3><pre>db.getCollection('products').find({}, {
+  'product_variant' : {
+     '$elemMatch' : {'color' : {'$in' : ['gray', 'red']}}
+   }    
+})</pre>		
 	</body>
 </html>
 
