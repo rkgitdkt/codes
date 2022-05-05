@@ -209,6 +209,11 @@
 				]);
 			});
 		</pre>
+		
+		<h2>Match , Object value inside array</h2>
+		<pre>'$match' : {
+		'product_variant': {'$elemMatch': {'color':{'$in': ['red', 'gray']}}}
+	      }</pre>
 
 		<h4>Compare date</h4>
 		<pre>Go Here :https://stackoverflow.com/questions/36497085/how-can-i-query-a-specific-date-in-mongodb-laravel-i-need-all-data-of-that-date
